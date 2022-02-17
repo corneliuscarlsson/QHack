@@ -16,10 +16,17 @@ def binary_list(m, n):
         - (list(int)): Binary stored as a list of length n
     """
 
-    arr = []
-    # QHACK #
+    arr = bin(m)
+    arr = arr.replace("b", "")
+    arr = [int(x) for x in str(arr)]
 
-    # QHACK #
+    diff = n - len(arr)
+
+    if diff != 0:
+        arr_lead = [0] * diff
+        arr_lead.extend(arr)
+        arr = arr_lead
+
     return arr
 
 
@@ -34,11 +41,18 @@ def basis_states(n):
         - (list(list(int))): list of basis states represented as lists of 0s and 1s.
     """
 
+    # we could have just used this and skipped the basis_states function all together
+    """
     arr = []
+    import itertools as it
+    for i in it.product([0, 1], repeat=n):
+        arr.append(i)
+    return arr
+    """
 
-    # QHACK #
-
-    # QHACK #
+    arr = []
+    for m in range(2**n):
+        arr.append(binary_list(m,n))
 
     return arr
 
@@ -55,9 +69,29 @@ def is_particle_preserving(circuit, n):
         - (bool): True / False according to whether the input circuit preserves the number of particles or not
     """
 
-    # QHACK #
+    states = basis_states(n)
+    for state in states:
+        input_num = sum(state)
+        output_num = sum(circuit(state))
+        if output_num != input_num:
+            return False
+    return True
 
-    # QHACK #
+# testing, expected False, returns False
+''' 
+dev = qml.device('default.qubit', wires=2)
+
+@qml.qnode(dev)
+def circuit(state):
+    for i in np.where(np.array(state) == 1)[0]:
+        qml.PauliX(wires=i)
+    qml.Hadamard(wires=0)
+    qml.CNOT(wires=[0,1])
+    qml.Hadamard(wires=0)
+    return qml.state()
+    
+print(is_particle_preserving(circuit, 2))
+'''
 
 
 if __name__ == "__main__":
